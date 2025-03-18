@@ -67,7 +67,7 @@ for name, model in models.items():
     train_rmse = np.sqrt(mean_squared_error(y_train_reg, train_pred))
     test_rmse = np.sqrt(mean_squared_error(y_test_reg, test_pred))
     train_mse = mean_squared_error(y_train_reg, train_pred)
-    test_mse = mean_squared_error(y_test_reg, test_pred))
+    test_mse = mean_squared_error(y_test_reg, test_pred)
     train_mae = mean_absolute_error(y_train_reg, train_pred)
     test_mae = mean_absolute_error(y_test_reg, test_pred)
     train_r2 = r2_score(y_train_reg, train_pred)
