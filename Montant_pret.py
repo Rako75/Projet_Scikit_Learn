@@ -124,12 +124,12 @@ credit_history = st.selectbox('Historique de crédit', [0, 1])
 
 # Créer un dictionnaire avec les valeurs saisies
 input_data = {
-    'education': [0 if education == 'Not Graduate' else 1],
-    'self_employed': [0 if self_employed == 'No' else 1],
-    'loan_status': [0 if loan_status == 'Rejected' else 1],
+    ' education': [0 if education == 'Not Graduate' else 1],
+    ' self_employed': [0 if self_employed == 'No' else 1],
+    ' loan_status': [0 if loan_status == 'Rejected' else 1],
     'applicant_income': [applicant_income],
     'coapplicant_income': [coapplicant_income],
-    'loan_amount': [loan_amount],
+    ' loan_amount': [loan_amount],
     'loan_amount_term': [loan_amount_term],
     'credit_history': [credit_history]
 }
