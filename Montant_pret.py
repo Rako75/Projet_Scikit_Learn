@@ -23,8 +23,8 @@ df_loan['self_employed'] = df_loan[' self_employed'].map({'No': 0, 'Yes': 1})
 df_loan['loan_status'] = df_loan[' loan_status'].map({'Rejected': 0, 'Approved': 1})
 
 # Séparation des features et de la target
-X = df_loan.drop(columns=['loan_amount'])
-y = df_loan['loan_amount']
+X = df_loan.drop(columns=[' loan_amount'])
+y = df_loan[' loan_amount']
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
