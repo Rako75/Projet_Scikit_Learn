@@ -1,8 +1,8 @@
-import streamlit as st
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
+import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
@@ -11,31 +11,44 @@ from sklearn.svm import SVR
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
+# Fonction pour charger les données et les afficher
+@st.cache
+def load_data(file_path):
+    df = pd.read_csv(file_path)
+    return df
+
+# Application Streamlit
+st.title("Prédiction du Montant du Prêt")
+
 # Charger les données
 fichier = "loan_approval_dataset.csv"
-df_loan = pd.read_csv(fichier)
+df_loan = load_data(fichier)
 
-# Prétraitement
+# Suppression de la colonne 'Loan_id'
 df_loan.drop('loan_id', axis=1, inplace=True)
-df_loan.dropna(inplace=True)
-df_loan['education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduate': 1})
-df_loan['self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
-df_loan['loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
 
-# Séparation des features et de la target
-X = df_loan.drop(columns=[' loan_amount'])
-y = df_loan[' loan_amount']
+# Transformation des variables catégorielles en numériques
+df_loan[' education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduate': 1})
+df_loan[ 'self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
+df_loan[' loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
+
+# Séparation des données en variables indépendantes (X) et variable cible (y)
+X_reg = df_loan.drop(columns=[' loan_amount'])
+y_reg = df_loan[' loan_amount']
+
+# Standardisation des données
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_reg = pd.DataFrame(scaler.fit_transform(X_reg), columns=X_reg.columns)
 
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+# Division en ensembles d'entraînement et de test
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(X_reg, y_reg, test_size=0.2, random_state=42)
 
-# Modèles
+# Initialisation des modèles
 models = {
     "Linear Regression": LinearRegression(),
     "Ridge Regression": Ridge(alpha=1.0),
     "Lasso Regression": Lasso(alpha=0.1),
-    "ElasticNet": ElasticNet(alpha=0.1, l1_ratio=0.5),
+    "ElasticNet Regression": ElasticNet(alpha=0.1, l1_ratio=0.5),
     "Decision Tree": DecisionTreeRegressor(),
     "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42),
     "Gradient Boosting": GradientBoostingRegressor(n_estimators=100, random_state=42),
@@ -43,38 +56,95 @@ models = {
     "SVR": SVR(kernel='rbf')
 }
 
-# Entraînement et évaluation
-df_results = pd.DataFrame(columns=["Model", "MSE", "MAE", "R2"])
+# Entraînement et évaluation des modèles
+results = {}
 
 for name, model in models.items():
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    mse = mean_squared_error(y_test, y_pred)
-    mae = mean_absolute_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-    df_results = df_results.append({"Model": name, "MSE": mse, "MAE": mae, "R2": r2}, ignore_index=True)
+    model.fit(X_train_reg, y_train_reg)
+    train_pred = model.predict(X_train_reg)
+    test_pred = model.predict(X_test_reg)
 
-best_model = df_results.sort_values(by="MSE").iloc[0]
+    train_rmse = np.sqrt(mean_squared_error(y_train_reg, train_pred))
+    test_rmse = np.sqrt(mean_squared_error(y_test_reg, test_pred))
+    train_mse = mean_squared_error(y_train_reg, train_pred)
+    test_mse = mean_squared_error(y_test_reg, test_pred)
+    train_mae = mean_absolute_error(y_train_reg, train_pred)
+    test_mae = mean_absolute_error(y_test_reg, test_pred)
+    train_r2 = r2_score(y_train_reg, train_pred)
+    test_r2 = r2_score(y_test_reg, test_pred)
 
-# Interface Streamlit
-st.title("Prédiction du Montant du Prêt")
+    results[name] = {
+        "Train RMSE": train_rmse,
+        "Test RMSE": test_rmse,
+        "Train MSE": train_mse,
+        "Test MSE": test_mse,
+        "Train MAE": train_mae,
+        "Test MAE": test_mae,
+        "Train R2": train_r2,
+        "Test R2": test_r2
+    }
 
-# Afficher les performances des modèles
-st.subheader("Comparaison des modèles")
-st.dataframe(df_results.sort_values(by="MSE"))
+# Convertir les résultats en DataFrame
+df_results = pd.DataFrame(results).T
 
-st.subheader(f"Meilleur modèle: {best_model['Model']}")
-st.write(f"MSE: {best_model['MSE']:.4f}, MAE: {best_model['MAE']:.4f}, R2: {best_model['R2']:.4f}")
+# Sélectionner le meilleur modèle en fonction des critères
+best_model = df_results.sort_values(by=['Test MSE', 'Test MAE', 'Test R2'], ascending=[True, True, False]).head(1)
 
-# Prédiction
-st.subheader("Faire une prédiction")
-user_input = {}
-for col in X.columns:
-    user_input[col] = st.number_input(f"{col}", value=float(X[col].mean()))
+# Afficher le meilleur modèle
+st.header("Meilleur Modèle de Prédiction")
+st.write(best_model)
 
-if st.button("Prédire le montant du prêt"):
-    model = models[best_model['Model']]
-    user_data = np.array([list(user_input.values())]).reshape(1, -1)
-    user_data_scaled = scaler.transform(user_data)
-    prediction = model.predict(user_data_scaled)
-    st.success(f"Montant estimé du prêt: {prediction[0]:.2f}")
+# Visualiser les performances des modèles
+metrics = ["Test RMSE", "Test MSE", "Test MAE", "Test R2"]
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+axes = axes.flatten()
+
+for i, metric in enumerate(metrics):
+    sns.barplot(x=df_results.index, y=df_results[metric], ax=axes[i])
+    axes[i].set_title(metric)
+    axes[i].tick_params(axis='x', rotation=45)
+
+st.pyplot()
+
+# Interface pour que l'utilisateur saisisse les valeurs
+st.header("Prédisez le Montant du Prêt")
+
+# Interface de saisie des variables pour la prédiction
+education = st.selectbox('Niveau d\'éducation', ['Not Graduate', 'Graduate'])
+self_employed = st.selectbox('Statut d\'emploi', ['No', 'Yes'])
+loan_status = st.selectbox('Statut du prêt', ['Rejected', 'Approved'])
+
+# Vous pouvez ajouter d'autres champs de saisie pour d'autres variables
+# Par exemple, 'ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', etc.
+applicant_income = st.number_input('Revenu de l\'applicant', min_value=0, step=1000)
+coapplicant_income = st.number_input('Revenu du coapplicant', min_value=0, step=1000)
+loan_amount = st.number_input('Montant du prêt', min_value=0, step=1000)
+loan_amount_term = st.selectbox('Durée du prêt', [12, 24, 36, 48, 60])
+credit_history = st.selectbox('Historique de crédit', [0, 1])
+
+# Créer un dictionnaire avec les valeurs saisies
+input_data = {
+    'education': [0 if education == 'Not Graduate' else 1],
+    'self_employed': [0 if self_employed == 'No' else 1],
+    'loan_status': [0 if loan_status == 'Rejected' else 1],
+    'applicant_income': [applicant_income],
+    'coapplicant_income': [coapplicant_income],
+    'loan_amount': [ loan_amount],
+    'loan_amount_term': [loan_amount_term],
+    'credit_history': [credit_history]
+}
+
+# Convertir le dictionnaire en DataFrame
+input_df = pd.DataFrame(input_data)
+
+# Appliquer la même transformation que pour les données d'entraînement
+input_df_scaled = scaler.transform(input_df)
+
+# Prédire le montant du prêt avec le meilleur modèle
+best_model_name = best_model.index[0]
+best_model_instance = models[best_model_name]
+prediction = best_model_instance.predict(input_df_scaled)
+
+# Afficher la prédiction
+st.subheader(f"Montant du prêt prédit avec le modèle {best_model_name}")
+st.write(f"Le montant prédit du prêt est : {prediction[0]:.2f} ")
