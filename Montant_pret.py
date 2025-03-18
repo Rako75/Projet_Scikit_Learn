@@ -18,9 +18,9 @@ df_loan = pd.read_csv(fichier)
 # Prétraitement
 df_loan.drop('loan_id', axis=1, inplace=True)
 df_loan.dropna(inplace=True)
-df_loan['education'] = df_loan['education'].map({'Not Graduate': 0, 'Graduate': 1})
-df_loan['self_employed'] = df_loan['self_employed'].map({'No': 0, 'Yes': 1})
-df_loan['loan_status'] = df_loan['loan_status'].map({'Rejected': 0, 'Approved': 1})
+df_loan['education'] = df_loan[' education'].map({'Not Graduate': 0, 'Graduate': 1})
+df_loan['self_employed'] = df_loan[' self_employed'].map({'No': 0, 'Yes': 1})
+df_loan['loan_status'] = df_loan[' loan_status'].map({'Rejected': 0, 'Approved': 1})
 
 # Séparation des features et de la target
 X = df_loan.drop(columns=['loan_amount'])
