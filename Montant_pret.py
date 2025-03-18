@@ -29,9 +29,8 @@ df_loan.drop('loan_id', axis=1, inplace=True)
 
 # Transformation des variables catégorielles en numériques
 df_loan[' education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduate': 1})
-df_loan[ 'self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
+df_loan[' self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
 df_loan[' loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
-
 # Séparation des données en variables indépendantes (X) et variable cible (y)
 X_reg = df_loan.drop(columns=[' loan_amount'])
 y_reg = df_loan[' loan_amount']
