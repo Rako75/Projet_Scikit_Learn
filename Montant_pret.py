@@ -71,7 +71,9 @@ best_reg_model = df_reg_results["MSE"].idxmin()
 best_reg_instance = regression_models[best_reg_model]
 
 # 🏷 **Classification**
-st.header("🎯 Classification du Statut du Prêt")
+st.header("🎯 Classification du statut du prêt")
+st.write("""Par Alex Rakotomalala
+""")
 
 # Définition des features et de la cible pour la **classification**
 X_class = df_loan.drop(columns=[' loan_status'])
@@ -120,7 +122,7 @@ best_class_model = df_class_results["Accuracy"].idxmax()
 best_class_instance = classification_models[best_class_model]
 
 # 📊 **Interface Streamlit**
-st.title("📊 Prédiction et Classification des Prêts")
+st.title("📊 Prédiction et Classification des prêts")
 st.write("""
 Bienvenue dans notre application de prédiction et de classification des demandes de prêt !  
 Cette application utilise plusieurs modèles de Machine Learning pour :  
@@ -130,7 +132,6 @@ Cette application utilise plusieurs modèles de Machine Learning pour :
 📌 **Comment utiliser cette application ?**  
 👉 Remplissez les informations requises dans la barre latérale.  
 👉 Obtenez instantanément une prédiction sur le montant du prêt et son statut d'approbation.
-Par Alex Rakotomalala
 """)
 
 # 📌 **Affichage des performances des modèles**
