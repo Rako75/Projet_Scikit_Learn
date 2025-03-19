@@ -20,13 +20,18 @@ df_loan = pd.read_csv(fichier)
 # Prétraitement des données
 df_loan.drop('loan_id', axis=1, inplace=True)
 df_loan.dropna(inplace=True)
-df_loan[' education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduate': 1})
-df_loan[' self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
-df_loan[' loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
 
-# Séparation des features et de la target pour la **régression**
-X_reg = df_loan.drop(columns=[' loan_amount'])
-y_reg = df_loan[' loan_amount']
+# Suppression des espaces dans les noms de colonnes
+df_loan.columns = df_loan.columns.str.strip()
+
+# Mapper les valeurs catégoriques
+df_loan['education'] = df_loan['education'].map({'Not Graduate': 0, 'Graduate': 1})
+df_loan['self_employed'] = df_loan['self_employed'].map({'No': 0, 'Yes': 1})
+df_loan['loan_status'] = df_loan['loan_status'].map({'Rejected': 0, 'Approved': 1})
+
+# Séparation des features et de la target pour la régression
+X_reg = df_loan.drop(columns=['loan_amount'])
+y_reg = df_loan['loan_amount']
 
 # Standardisation des données
 scaler = StandardScaler()
@@ -73,9 +78,9 @@ best_reg_instance = regression_models[best_reg_model]
 # 🏷 **Classification**
 st.header("🎯 Classification du Statut du Prêt")
 
-# Définition des features et de la cible pour la **classification**
-X_class = df_loan.drop(columns=[' loan_status'])
-y_class = df_loan[' loan_status']
+# Définition des features et de la cible pour la classification
+X_class = df_loan.drop(columns=['loan_status'])
+y_class = df_loan['loan_status']
 
 # Standardisation des données
 X_class_scaled = scaler.fit_transform(X_class)
@@ -137,8 +142,16 @@ st.sidebar.header("📝 Prédiction en Temps Réel")
 # Entrée utilisateur pour la régression et classification
 st.sidebar.subheader("📊 Prédiction du Montant du Prêt et Statut")
 user_input = {}
+
 for col in X_class.columns:
-    user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
+    if col == 'education':
+        education_option = st.sidebar.selectbox("Niveau d'éducation", ["Not Graduate", "Graduate"])
+        user_input[col] = 1 if education_option == "Graduate" else 0
+    elif col == 'self_employed':
+        self_employed_option = st.sidebar.selectbox("Travailleur indépendant", ["No", "Yes"])
+        user_input[col] = 1 if self_employed_option == "Yes" else 0
+    else:
+        user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
 
 input_df = pd.DataFrame([user_input])
 input_scaled = scaler.transform(input_df)
