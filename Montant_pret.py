@@ -144,6 +144,8 @@ for col in X_class.columns:
     elif col == ' self_employed':
         self_employed_option = st.sidebar.selectbox(" Travailleur indépendant", [" No", " Yes"])
         user_input[col] = 1 if self_employed_option == " Yes" else 0
+    elif col == ' no_of_dependents':
+        user_input[col] = st.sidebar.number_input(f"{col}", min_value=0, max_value=5, step=1, value=3)
     else:
         user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
 
