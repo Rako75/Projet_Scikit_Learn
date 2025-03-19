@@ -163,7 +163,7 @@ st.sidebar.header("📊 Prédiction du Montant du prêt et statut")
 # Entrée utilisateur pour la régression et classification
 user_input = {}
 for col in X_class.columns:
-    if col == "Niveau d'éducation':
+    if col == 'Niveau d éducation':
         education_option = st.sidebar.selectbox(" Niveau d'éducation", [" Not Graduate", " Graduate"])
         user_input[col] = 1 if education_option == " Graduate" else 0
     elif col == 'Travailleur indépendant':
