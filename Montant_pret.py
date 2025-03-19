@@ -70,9 +70,6 @@ df_reg_results = pd.DataFrame(regression_results).T
 best_reg_model = df_reg_results["MSE"].idxmin()
 best_reg_instance = regression_models[best_reg_model]
 
-# 🏷 **Classification**
-st.header("🎯 Classification du statut du prêt")
-
 # Définition des features et de la cible pour la **classification**
 X_class = df_loan.drop(columns=[' loan_status'])
 y_class = df_loan[' loan_status']
