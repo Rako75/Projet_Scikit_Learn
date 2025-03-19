@@ -121,6 +121,17 @@ best_class_instance = classification_models[best_class_model]
 
 # 📊 **Interface Streamlit**
 st.title("📊 Prédiction et Classification des Prêts")
+st.write("""
+Bienvenue dans notre application de prédiction et de classification des demandes de prêt !  
+Cette application utilise plusieurs modèles de Machine Learning pour :  
+- Prédire le montant du prêt qui peut être accordé.  
+- Déterminer si une demande de prêt sera approuvée ou refusée.  
+
+📌 **Comment utiliser cette application ?**  
+👉 Remplissez les informations requises dans la barre latérale.  
+👉 Obtenez instantanément une prédiction sur le montant du prêt et son statut d'approbation.
+Par Alex Rakotomalala
+""")
 
 # 📌 **Affichage des performances des modèles**
 st.subheader("Comparaison des modèles de régression")
