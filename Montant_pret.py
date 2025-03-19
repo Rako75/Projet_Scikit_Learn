@@ -138,12 +138,12 @@ st.sidebar.header("📝 Prédiction en Temps Réel")
 st.sidebar.subheader("📊 Prédiction du Montant du Prêt et Statut")
 user_input = {}
 for col in X_class.columns:
-    if col == 'education':
-        education_option = st.sidebar.selectbox("Niveau d'éducation", ["Not Graduate", "Graduate"])
-        user_input[col] = 1 if education_option == "Graduate" else 0
-    elif col == 'self_employed':
-        self_employed_option = st.sidebar.selectbox("Travailleur indépendant", ["No", "Yes"])
-        user_input[col] = 1 if self_employed_option == "Yes" else 0
+    if col == ' education':
+        education_option = st.sidebar.selectbox(" Niveau d'éducation", [" Not Graduate", " Graduate"])
+        user_input[col] = 1 if education_option == " Graduate" else 0
+    elif col == ' self_employed':
+        self_employed_option = st.sidebar.selectbox(" Travailleur indépendant", [" No", " Yes"])
+        user_input[col] = 1 if self_employed_option == " Yes" else 0
     else:
         user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
 
