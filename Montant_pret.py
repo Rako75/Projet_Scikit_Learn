@@ -36,7 +36,7 @@ df_loan.rename(columns={
 df_loan.drop('loan_id', axis=1, inplace=True)
 df_loan.dropna(inplace=True)
 df_loan['Niveau d éducation'] = df_loan['Niveau d éducation'].map({' Not Graduate': 0, ' Graduate': 1})
-df_loan['Travailleur indépendant'] = df_loan['Travailleur indépendant']'].map({' No': 0, ' Yes': 1})
+df_loan['Travailleur indépendant'] = df_loan['Travailleur indépendant'].map({' No': 0, ' Yes': 1})
 df_loan['Statut du prêt'] = df_loan['Statut du prêt'].map({' Rejected': 0, ' Approved': 1})
 
 # Séparation des features et de la target pour la **régression**
