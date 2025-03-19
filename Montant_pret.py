@@ -141,10 +141,30 @@ st.write(f"🏆 **Meilleur modèle de classification** : {best_class_model}")
 # ✅ **Prédiction en temps réel**
 st.sidebar.header("📝 Prédiction en Temps Réel")
 
+# Mapping des noms de variables en français
+nom_variables = {
+    ' education': "Niveau d'éducation",
+    ' self_employed': "Travailleur indépendant",
+    ' applicant_income': "Revenu du demandeur",
+    ' coapplicant_income': "Revenu du co-demandeur",
+    ' income_annum': "Revenu annuel",
+    ' cibil_score': "Score CIBIL",
+    ' residential_assets_value': "Valeur des biens résidentiels",
+    ' commercial_assets_value': "Valeur des biens commerciaux",
+    ' luxury_assets_value': "Valeur des biens de luxe",
+    ' bank_asset_value': "Valeur des actifs bancaires",
+    ' loan_amount': "Montant du prêt",
+    ' loan_term': "Durée du prêt (mois)",
+    ' credit_history': "Historique de crédit",
+    ' property_area': "Zone de la propriété",
+    ' no_of_dependents': "Nombre de personnes à charge"
+}
+
 # Entrée utilisateur pour la régression et classification
 st.sidebar.subheader("📊 Prédiction du Montant du Prêt et Statut")
 user_input = {}
 for col in X_class.columns:
+    nom_affiche = nom_variables.get(col, col)  # Utilise le nom en français si disponible
     if col == ' education':
         education_option = st.sidebar.selectbox(" Niveau d'éducation", [" Not Graduate", " Graduate"])
         user_input[col] = 1 if education_option == " Graduate" else 0
