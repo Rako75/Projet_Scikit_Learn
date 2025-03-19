@@ -22,11 +22,12 @@ df_loan.rename(columns={
     ' education': 'Niveau d éducation',
     ' self_employed': 'Travailleur indépendant',
     ' loan_status': 'Statut du prêt',
+    ' loan_term' : 'Durée du prêt',
     ' no_of_dependents': 'Nombre de personnes à charge',
     ' income_annum': 'Revenu annuel',
     ' cibil_score': 'Score CIBIL',
     ' residential_assets_value': 'Valeur des biens résidentiels',
-    ' commercial_assets_value ': 'Valeur des biens commerciaux',
+    ' commercial_assets_value': 'Valeur des biens commerciaux',
     ' luxury_assets_value': 'Valeur des biens de luxe',
     ' bank_asset_value': 'Valeur des actifs bancaires',
     ' loan_amount': 'Montant du prêt'
