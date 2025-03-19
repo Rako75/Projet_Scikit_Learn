@@ -33,7 +33,7 @@ df_loan.rename(columns={
     ' income_annum': "Revenu annuel",
     ' cibil_score': "Score CIBIL",
     ' residential_assets_value': "Valeur des biens résidentiels",
-    ' commercial_assets_value ': "Valeur des biens commerciaux",
+    ' commercial_assets_value': "Valeur des biens commerciaux",
     ' luxury_assets_value': "Valeur des biens de luxe",
     ' bank_asset_value': "Valeur des actifs bancaires",
     ' loan_amount': "Montant du prêt",
@@ -158,10 +158,9 @@ st.dataframe(df_class_results)
 st.write(f"🏆 **Meilleur modèle de classification** : {best_class_model}")
 
 # ✅ **Prédiction en temps réel**
-st.sidebar.header("📝 Prédiction en temps réel")
+st.sidebar.header("📊 Prédiction du Montant du prêt et statut")
 
 # Entrée utilisateur pour la régression et classification
-st.sidebar.subheader("📊 Prédiction du Montant du prêt et statut")
 user_input = {}
 for col in X_class.columns:
     if col == ' education':
