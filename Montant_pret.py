@@ -72,8 +72,6 @@ best_reg_instance = regression_models[best_reg_model]
 
 # 🏷 **Classification**
 st.header("🎯 Classification du statut du prêt")
-st.write("""Par Alex Rakotomalala
-""")
 
 # Définition des features et de la cible pour la **classification**
 X_class = df_loan.drop(columns=[' loan_status'])
