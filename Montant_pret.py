@@ -44,9 +44,9 @@ df_loan.rename(columns={
 }, inplace=True)
 
 # Mise à jour des mappings pour les variables catégorielles
-df_loan['Niveau d éducation'] = df_loan['Niveau d éducation'].map({' Not Graduate': 0, ' Graduate': 1})
-df_loan['Travailleur indépendant'] = df_loan['Travailleur indépendant'].map({' No': 0, ' Yes': 1})
-df_loan['Statut du prêt'] = df_loan['Statut du prêt'].map({' Rejected': 0, ' Approved': 1})
+df_loan[' Niveau d éducation'] = df_loan[' Niveau d éducation'].map({' Not Graduate': 0, ' Graduate': 1})
+df_loan[' Travailleur indépendant'] = df_loan[' Travailleur indépendant'].map({' No': 0, ' Yes': 1})
+df_loan[' Statut du prêt'] = df_loan[' Statut du prêt'].map({' Rejected': 0, ' Approved': 1})
 
 # Séparation des features et de la target pour la **régression**
 X_reg = df_loan.drop(columns=['Montant du prêt'])
