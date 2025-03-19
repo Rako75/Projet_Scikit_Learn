@@ -15,6 +15,11 @@ from sklearn.naive_bayes import GaussianNB
 
 # Charger les données
 fichier = "loan_approval_dataset.csv"
+df_loan = pd.read_csv(fichier)
+
+# Prétraitement des données
+df_loan.drop('loan_id', axis=1, inplace=True)
+df_loan.dropna(inplace=True)
 df_loan[' education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduate': 1})
 df_loan[' self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
 df_loan[' loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
@@ -35,7 +40,11 @@ regression_models = {
     "Linear Regression": LinearRegression(),
     "Ridge Regression": Ridge(alpha=1.0),
     "Lasso Regression": Lasso(alpha=0.1),
-@@ -45,61 +48,106 @@
+    "ElasticNet": ElasticNet(alpha=0.1, l1_ratio=0.5),
+    "Decision Tree": DecisionTreeRegressor(),
+    "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42),
+    "Gradient Boosting": GradientBoostingRegressor(n_estimators=100, random_state=42),
+    "AdaBoost": AdaBoostRegressor(n_estimators=100, random_state=42),
     "SVR": SVR(kernel='rbf')
 }
 
@@ -54,17 +63,6 @@ for name, model in regression_models.items():
         "MSE": mse,
         "MAE": mae,
         "R²": r2
-
-
-
-
-
-
-
-
-
-
-
     }
 
 # 📈 **Sélection du meilleur modèle de régression**
@@ -148,7 +146,6 @@ for col in X_class.columns:
         user_input[col] = 1 if self_employed_option == "Yes" else 0
     else:
         user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
-
 
 input_df = pd.DataFrame([user_input])
 input_scaled = scaler.transform(input_df)
