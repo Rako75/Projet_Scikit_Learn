@@ -1,15 +1,17 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import streamlit as st
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.svm import SVR
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet, LogisticRegression
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from sklearn.svm import SVR, SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
 
 # Charger les données
 fichier = "loan_approval_dataset.csv"
@@ -21,19 +23,20 @@ df_loan.dropna(inplace=True)
 df_loan[' education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduate': 1})
 df_loan[' self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
 df_loan[' loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
-# Séparation des features et de la target
-X = df_loan.drop(columns=[' loan_amount'])
-y = df_loan[' loan_amount']
+
+# Séparation des features et de la target pour la **régression**
+X_reg = df_loan.drop(columns=[' loan_amount'])
+y_reg = df_loan[' loan_amount']
 
 # Standardisation des données
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_reg_scaled = scaler.fit_transform(X_reg)
 
 # Division en ensembles d'entraînement et de test
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(X_reg_scaled, y_reg, test_size=0.2, random_state=42)
 
-# Initialisation des modèles
-models = {
+# 📌 **Modèles de régression**
+regression_models = {
     "Linear Regression": LinearRegression(),
     "Ridge Regression": Ridge(alpha=1.0),
     "Lasso Regression": Lasso(alpha=0.1),
@@ -45,61 +48,106 @@ models = {
     "SVR": SVR(kernel='rbf')
 }
 
-# Entraînement et évaluation des modèles
-results = {}
+# 📊 **Entraînement des modèles de régression**
+regression_results = {}
 
-for name, model in models.items():
-    model.fit(X_train, y_train)
-    train_pred = model.predict(X_train)
-    test_pred = model.predict(X_test)
+for name, model in regression_models.items():
+    model.fit(X_train_reg, y_train_reg)
+    y_pred = model.predict(X_test_reg)
 
-    train_rmse = np.sqrt(mean_squared_error(y_train, train_pred))
-    test_rmse = np.sqrt(mean_squared_error(y_test, test_pred))
-    train_mse = mean_squared_error(y_train, train_pred)
-    test_mse = mean_squared_error(y_test, test_pred)
-    train_mae = mean_absolute_error(y_train, train_pred)
-    test_mae = mean_absolute_error(y_test, test_pred)
-    train_r2 = r2_score(y_train, train_pred)
-    test_r2 = r2_score(y_test, test_pred)
+    mse = mean_squared_error(y_test_reg, y_pred)
+    mae = mean_absolute_error(y_test_reg, y_pred)
+    r2 = r2_score(y_test_reg, y_pred)
 
-    results[name] = {
-        "Train RMSE": train_rmse,
-        "Test RMSE": test_rmse,
-        "Train MSE": train_mse,
-        "Test MSE": test_mse,
-        "Train MAE": train_mae,
-        "Test MAE": test_mae,
-        "Train R2": train_r2,
-        "Test R2": test_r2
+    regression_results[name] = {
+        "MSE": mse,
+        "MAE": mae,
+        "R²": r2
     }
 
-# Comparaison des performances des modèles
-df_results = pd.DataFrame(results).T
-best_model_name = df_results.sort_values(by="Test MSE").index[0]
-best_model_instance = models[best_model_name]
+# 📈 **Sélection du meilleur modèle de régression**
+df_reg_results = pd.DataFrame(regression_results).T
+best_reg_model = df_reg_results["MSE"].idxmin()
+best_reg_instance = regression_models[best_reg_model]
 
-# Interface Streamlit
-st.title("Prédiction du Montant du Prêt")
+# 🏷 **Classification**
+st.header("🎯 Classification du Statut du Prêt")
 
-# Affichage des performances des modèles
-st.subheader("Comparaison des modèles")
-st.dataframe(df_results.sort_values(by="Test MSE"))
+# Définition des features et de la cible pour la **classification**
+X_class = df_loan.drop(columns=[' loan_status'])
+y_class = df_loan[' loan_status']
 
-st.subheader(f"Meilleur modèle: {best_model_name}")
-st.write(f"MSE: {df_results.loc[best_model_name, 'Test MSE']:.4f}, MAE: {df_results.loc[best_model_name, 'Test MAE']:.4f}, R2: {df_results.loc[best_model_name, 'Test R2']:.4f}")
+# Standardisation des données
+X_class_scaled = scaler.fit_transform(X_class)
 
-# Interface utilisateur pour faire des prédictions
-st.subheader("Faire une prédiction")
+# Division en ensembles d'entraînement et de test
+X_train_class, X_test_class, y_train_class, y_test_class = train_test_split(X_class_scaled, y_class, test_size=0.2, random_state=42)
+
+# 📌 **Modèles de classification**
+classification_models = {
+    "Logistic Regression": LogisticRegression(),
+    "Decision Tree": DecisionTreeClassifier(),
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+    "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
+    "AdaBoost": AdaBoostClassifier(n_estimators=100, random_state=42),
+    "SVM": SVC(),
+    "KNN": KNeighborsClassifier(),
+    "Naive Bayes": GaussianNB(),
+}
+
+# 📊 **Entraînement des modèles de classification**
+classification_results = {}
+
+for name, model in classification_models.items():
+    model.fit(X_train_class, y_train_class)
+    y_pred = model.predict(X_test_class)
+
+    acc = accuracy_score(y_test_class, y_pred)
+    precision = precision_score(y_test_class, y_pred, average='weighted')
+    recall = recall_score(y_test_class, y_pred, average='weighted')
+    f1 = f1_score(y_test_class, y_pred, average='weighted')
+
+    classification_results[name] = {
+        "Accuracy": acc,
+        "Precision": precision,
+        "Recall": recall,
+        "F1-score": f1
+    }
+
+# 📈 **Sélection du meilleur modèle de classification**
+df_class_results = pd.DataFrame(classification_results).T
+best_class_model = df_class_results["Accuracy"].idxmax()
+best_class_instance = classification_models[best_class_model]
+
+# 📊 **Interface Streamlit**
+st.title("📊 Prédiction et Classification des Prêts")
+
+# 📌 **Affichage des performances des modèles**
+st.subheader("Comparaison des modèles de régression")
+st.dataframe(df_reg_results)
+st.write(f"🏆 **Meilleur modèle de régression** : {best_reg_model}")
+
+st.subheader("Comparaison des modèles de classification")
+st.dataframe(df_class_results)
+st.write(f"🏆 **Meilleur modèle de classification** : {best_class_model}")
+
+# ✅ **Prédiction en temps réel**
+st.sidebar.header("📝 Prédiction en Temps Réel")
+
+# Entrée utilisateur pour la régression et classification
+st.sidebar.subheader("📊 Prédiction du Montant du Prêt et Statut")
 user_input = {}
-for col in X.columns:
-    user_input[col] = st.number_input(f"{col}", value=float(X[col].mean()))
+for col in X_class.columns:
+    user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
 
-# Prétraiter les entrées utilisateur
 input_df = pd.DataFrame([user_input])
-input_df = input_df[X.columns]  # Réorganiser les colonnes de input_df pour correspondre à X.columns
-input_df_scaled = scaler.transform(input_df)
+input_scaled = scaler.transform(input_df)
 
-# Prédire le montant du prêt avec le meilleur modèle
-if st.button("Prédire le montant du prêt"):
-    prediction = best_model_instance.predict(input_df_scaled)
-    st.success(f"Montant estimé du prêt: {prediction[0]:.2f}")
+# **Prédiction avec le meilleur modèle de régression**
+predicted_loan_amount = best_reg_instance.predict(input_scaled)[0]
+st.sidebar.write(f"💰 **Montant du prêt prédit** : {predicted_loan_amount:,.2f} ")
+
+# **Prédiction avec le meilleur modèle de classification**
+if st.sidebar.button("🔮 Prédire le Statut du Prêt"):
+    predicted_status = best_class_instance.predict(input_scaled)[0]
+    st.sidebar.write(f"🏦 **Statut du prêt prédit** : {'Approuvé' if predicted_status == 1 else 'Refusé'}")
