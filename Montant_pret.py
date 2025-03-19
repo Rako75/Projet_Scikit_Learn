@@ -163,13 +163,13 @@ st.sidebar.header("📊 Prédiction du Montant du prêt et statut")
 # Entrée utilisateur pour la régression et classification
 user_input = {}
 for col in X_class.columns:
-    if col == ' education':
+    if col == " Niveau d'éducation':
         education_option = st.sidebar.selectbox(" Niveau d'éducation", [" Not Graduate", " Graduate"])
         user_input[col] = 1 if education_option == " Graduate" else 0
-    elif col == ' self_employed':
+    elif col == ' Travailleur indépendant':
         self_employed_option = st.sidebar.selectbox(" Travailleur indépendant", [" No", " Yes"])
         user_input[col] = 1 if self_employed_option == " Yes" else 0
-    elif col == ' no_of_dependents':
+    elif col == ' Nombre de personnes à charge':
         user_input[col] = st.sidebar.number_input(f"{col}", min_value=0, max_value=5, step=1, value=3)
     else:
         user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
