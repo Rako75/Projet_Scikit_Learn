@@ -24,9 +24,28 @@ df_loan[' education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduat
 df_loan[' self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
 df_loan[' loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
 
+# Renommer les colonnes en français
+df_loan.rename(columns={
+    ' education': "Niveau d'éducation",
+    ' self_employed': "Travailleur indépendant",
+    ' applicant_income': "Revenu du demandeur",
+    ' coapplicant_income': "Revenu du co-demandeur",
+    ' income_annum': "Revenu annuel",
+    ' cibil_score': "Score CIBIL",
+    ' residential_assets_value': "Valeur des biens résidentiels",
+    ' commercial_assets_value ': "Valeur des biens commerciaux",
+    ' luxury_assets_value': "Valeur des biens de luxe",
+    ' bank_asset_value': "Valeur des actifs bancaires",
+    ' loan_amount': "Montant du prêt",
+    ' loan_term': "Durée du prêt (mois)",
+    ' credit_history': "Historique de crédit",
+    ' property_area': "Zone de la propriété",
+    ' no_of_dependents': "Nombre de personnes à charge"
+}, inplace=True)
+
 # Séparation des features et de la target pour la **régression**
-X_reg = df_loan.drop(columns=[' loan_amount'])
-y_reg = df_loan[' loan_amount']
+X_reg = df_loan.drop(columns=['Montant du prêt'])
+y_reg = df_loan['Montant du prêt']
 
 # Standardisation des données
 scaler = StandardScaler()
@@ -139,32 +158,12 @@ st.dataframe(df_class_results)
 st.write(f"🏆 **Meilleur modèle de classification** : {best_class_model}")
 
 # ✅ **Prédiction en temps réel**
-st.sidebar.header("📝 Prédiction en Temps Réel")
-
-# Mapping des noms de variables en français
-nom_variables = {
-    ' education': "Niveau d'éducation",
-    ' self_employed': "Travailleur indépendant",
-    ' applicant_income': "Revenu du demandeur",
-    ' coapplicant_income': "Revenu du co-demandeur",
-    ' income_annum': "Revenu annuel",
-    ' cibil_score': "Score CIBIL",
-    ' residential_assets_value': "Valeur des biens résidentiels",
-    ' commercial_assets_value': "Valeur des biens commerciaux",
-    ' luxury_assets_value': "Valeur des biens de luxe",
-    ' bank_asset_value': "Valeur des actifs bancaires",
-    ' loan_amount': "Montant du prêt",
-    ' loan_term': "Durée du prêt (mois)",
-    ' credit_history': "Historique de crédit",
-    ' property_area': "Zone de la propriété",
-    ' no_of_dependents': "Nombre de personnes à charge"
-}
+st.sidebar.header("📝 Prédiction en temps réel")
 
 # Entrée utilisateur pour la régression et classification
-st.sidebar.subheader("📊 Prédiction du Montant du Prêt et Statut")
+st.sidebar.subheader("📊 Prédiction du Montant du prêt et statut")
 user_input = {}
 for col in X_class.columns:
-    nom_affiche = nom_variables.get(col, col)  # Utilise le nom en français si disponible
     if col == ' education':
         education_option = st.sidebar.selectbox(" Niveau d'éducation", [" Not Graduate", " Graduate"])
         user_input[col] = 1 if education_option == " Graduate" else 0
