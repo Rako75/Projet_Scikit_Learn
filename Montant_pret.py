@@ -4,6 +4,10 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+
+
+
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet, LogisticRegression
@@ -15,23 +19,13 @@ from sklearn.naive_bayes import GaussianNB
 
 # Charger les données
 fichier = "loan_approval_dataset.csv"
-df_loan = pd.read_csv(fichier)
+df_loan[' education'] = df_loan[' education'].map({' Not Graduate': 0, ' Graduate': 1})
+df_loan[' self_employed'] = df_loan[' self_employed'].map({' No': 0, ' Yes': 1})
+df_loan[' loan_status'] = df_loan[' loan_status'].map({' Rejected': 0, ' Approved': 1})
 
-# Prétraitement des données
-df_loan.drop('loan_id', axis=1, inplace=True)
-df_loan.dropna(inplace=True)
-
-# Suppression des espaces dans les noms de colonnes
-df_loan.columns = df_loan.columns.str.strip()
-
-# Mapper les valeurs catégoriques
-df_loan['education'] = df_loan['education'].map({'Not Graduate': 0, 'Graduate': 1})
-df_loan['self_employed'] = df_loan['self_employed'].map({'No': 0, 'Yes': 1})
-df_loan['loan_status'] = df_loan['loan_status'].map({'Rejected': 0, 'Approved': 1})
-
-# Séparation des features et de la target pour la régression
-X_reg = df_loan.drop(columns=['loan_amount'])
-y_reg = df_loan['loan_amount']
+# Séparation des features et de la target pour la **régression**
+X_reg = df_loan.drop(columns=[' loan_amount'])
+y_reg = df_loan[' loan_amount']
 
 # Standardisation des données
 scaler = StandardScaler()
@@ -45,11 +39,7 @@ regression_models = {
     "Linear Regression": LinearRegression(),
     "Ridge Regression": Ridge(alpha=1.0),
     "Lasso Regression": Lasso(alpha=0.1),
-    "ElasticNet": ElasticNet(alpha=0.1, l1_ratio=0.5),
-    "Decision Tree": DecisionTreeRegressor(),
-    "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42),
-    "Gradient Boosting": GradientBoostingRegressor(n_estimators=100, random_state=42),
-    "AdaBoost": AdaBoostRegressor(n_estimators=100, random_state=42),
+@@ -45,61 +48,106 @@
     "SVR": SVR(kernel='rbf')
 }
 
@@ -68,6 +58,17 @@ for name, model in regression_models.items():
         "MSE": mse,
         "MAE": mae,
         "R²": r2
+
+
+
+
+
+
+
+
+
+
+
     }
 
 # 📈 **Sélection du meilleur modèle de régression**
@@ -78,9 +79,9 @@ best_reg_instance = regression_models[best_reg_model]
 # 🏷 **Classification**
 st.header("🎯 Classification du Statut du Prêt")
 
-# Définition des features et de la cible pour la classification
-X_class = df_loan.drop(columns=['loan_status'])
-y_class = df_loan['loan_status']
+# Définition des features et de la cible pour la **classification**
+X_class = df_loan.drop(columns=[' loan_status'])
+y_class = df_loan[' loan_status']
 
 # Standardisation des données
 X_class_scaled = scaler.fit_transform(X_class)
@@ -142,7 +143,6 @@ st.sidebar.header("📝 Prédiction en Temps Réel")
 # Entrée utilisateur pour la régression et classification
 st.sidebar.subheader("📊 Prédiction du Montant du Prêt et Statut")
 user_input = {}
-
 for col in X_class.columns:
     if col == 'education':
         education_option = st.sidebar.selectbox("Niveau d'éducation", ["Not Graduate", "Graduate"])
@@ -152,6 +152,7 @@ for col in X_class.columns:
         user_input[col] = 1 if self_employed_option == "Yes" else 0
     else:
         user_input[col] = st.sidebar.number_input(f"{col}", float(df_loan[col].min()), float(df_loan[col].max()), float(df_loan[col].mean()))
+
 
 input_df = pd.DataFrame([user_input])
 input_scaled = scaler.transform(input_df)
